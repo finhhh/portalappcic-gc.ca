@@ -109,6 +109,14 @@
             border-radius: 15px;
             font-size: 14px;
             margin: 10px 0;
+            text-align: center;
+            align-self: center;
+            width: fit-content;
+        }
+
+        .status-badge.completed {
+            background: #e6ffe6;
+            color: green;
         }
 
         .details-grid {
@@ -353,6 +361,9 @@
         <h3>Application Details</h3>
         <div class="application-container">
             <div class="details-grid">
+                <dt class="status-badge" style="margin: 0; display: flex; justify-content: center;">In Progress</dt>
+                <dd style="align-self: center;"></dd>
+
                 <dt>Application Type:</dt>
                 <dd id="applicationType">Loading...</dd>
 
@@ -517,12 +528,23 @@
                 // Get application data for new fields
                 const { data: applicationData, error: applicationError } = await supabase
                     .from('applications')
-                    .select('passport_no, nationality, iccrc_agent, dob')
+                    .select('application_status, passport_no, nationality, iccrc_agent, dob')
                     .eq('user_id', currentUser.id)
                     .single();
 
                 if (applicationError) {
                     console.error('Error fetching application details:', applicationError);
+                } else if (applicationData) {
+                    // Update status badge with status from database
+                    const statusBadge = document.querySelector('.status-badge');
+                    statusBadge.textContent = applicationData.application_status;
+                    
+                    // Change color to green if status is Completed
+                    if (applicationData.application_status === 'Completed') {
+                        statusBadge.classList.add('completed');
+                    } else {
+                        statusBadge.classList.remove('completed');
+                    }
                 }
                 
                 // Fetch checklist visibility data
