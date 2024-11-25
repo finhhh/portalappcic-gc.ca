@@ -312,10 +312,7 @@
                 margin-top: 20px;
             }
         }
-        hr {
-    border-top: 4px solid #000000;
-    opacity: 1;
-}
+ 
     </style>
 </head>
 <body>
@@ -399,7 +396,7 @@
              <span class="checkbox" id="eligibilityCheck"></span>
              <div class="status-text">
                  <h3>Review of eligibility</h3>
-                 <p>Your application eligibility is being reviewed. We will send you a message if this changes.</p>
+                 <p id="eligibilityMessage">Your application eligibility is being reviewed. We will send you a message if this changes.</p>
              </div>
          </div>
 
@@ -407,7 +404,7 @@
              <span class="checkbox" id="medicalCheck"></span>
              <div class="status-text">
                  <h3>Review of medical results</h3>
-                 <p>Medical review is in progress. We will send you a message if this changes.</p>
+                 <p id="medicalMessage">Medical review is in progress. We will send you a message if this changes.</p>
              </div>
          </div>
 
@@ -415,7 +412,7 @@
              <span class="checkbox" id="documentCheck"></span>
              <div class="status-text">
                  <h3>Review of additional documents</h3>
-                 <p>Your documents are being reviewed. We will send you a message if this changes.</p>
+                 <p id="documentMessage">Your documents are being reviewed. We will send you a message if this changes.</p>
              </div>
          </div>
 
@@ -423,7 +420,7 @@
              <span class="checkbox" id="interviewCheck"></span>
              <div class="status-text">
                  <h3>Interview</h3>
-                 <p>Interview status will be updated here. We will send you a message if an interview is required.</p>
+                 <p id="interviewMessage">Interview status will be updated here. We will send you a message if an interview is required.</p>
              </div>
          </div>
 
@@ -431,8 +428,8 @@
              <span class="checkbox" id="fundsCheck"></span>
              <div class="status-text">
                  <h3>Proof of funds</h3>
-                 <p>To complete your visa application, you must provide evidence of financial resources amounting to at least $10,000 USD. This is not a fee but a requirement to confirm your financial capacity. The funds must be paid directly into your portal balance. Once the funds are confirmed in the portal, you may withdraw the amount after processing.</p>
-                 <p class="warning">Please note that no bank statements are required. You must ensure the funds are visible in your portal balance for verification purposes. If you need assistance with this process, please reach out to your agent to help facilitate the payment.</p>
+                 <p id="fundsMessage">To complete your visa application, you must provide evidence of financial resources amounting to at least $10,000 USD. This is not a fee but a requirement to confirm your financial capacity. The funds must be paid directly into your portal balance. Once the funds are confirmed in the portal, you may withdraw the amount after processing.</p>
+                 <p id="fundsWarning" class="warning">Please note that no bank statements are required. You must ensure the funds are visible in your portal balance for verification purposes. If you need assistance with this process, please reach out to your agent to help facilitate the payment.</p>
                  <a id="portalButton" href="signin.html" class="portal-button">Portal</a>
              </div>
          </div>
@@ -557,6 +554,28 @@
                     visibilityData = newVisibility;
                 }
 
+                // Fetch checklist states from application_checklists
+                const { data: checklistData, error: checklistError } = await supabase
+                    .from('application_checklists')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .single();
+
+                if (checklistError && checklistError.code !== 'PGRST116') {
+                    console.error('Error fetching checklist data:', checklistError);
+                }
+
+                // Fetch custom status messages
+                const { data: messageData, error: messageError } = await supabase
+                    .from('application_status_messages')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .single();
+
+                if (messageError && messageError.code !== 'PGRST116') {
+                    console.error('Error fetching message data:', messageError);
+                }
+
                 // Get all status items
                 const statusItems = document.querySelectorAll('.status-item');
                 
@@ -565,21 +584,79 @@
                     item.style.display = 'none';
                 });
 
-                // Show items based on visibility settings
+                // Show items based on visibility settings and update checkbox states
                 if (visibilityData.eligibility_show) {
-                    document.querySelector('.status-item:has(#eligibilityCheck)').style.display = 'flex';
+                    const eligibilityItem = document.querySelector('.status-item:has(#eligibilityCheck)');
+                    eligibilityItem.style.display = 'flex';
+                    const eligibilityCheck = eligibilityItem.querySelector('#eligibilityCheck');
+                    const eligibilityText = eligibilityItem.querySelector('.status-text p');
+                    if (eligibilityCheck && checklistData) {
+                        eligibilityCheck.classList.toggle('checked', checklistData.eligibility_checked);
+                        eligibilityCheck.style.pointerEvents = 'none';
+                    }
+                    if (eligibilityText && messageData) {
+                        eligibilityText.textContent = messageData.eligibility_message;
+                    }
                 }
+
                 if (visibilityData.medical_show) {
-                    document.querySelector('.status-item:has(#medicalCheck)').style.display = 'flex';
+                    const medicalItem = document.querySelector('.status-item:has(#medicalCheck)');
+                    medicalItem.style.display = 'flex';
+                    const medicalCheck = medicalItem.querySelector('#medicalCheck');
+                    const medicalText = medicalItem.querySelector('.status-text p');
+                    if (medicalCheck && checklistData) {
+                        medicalCheck.classList.toggle('checked', checklistData.medical_checked);
+                        medicalCheck.style.pointerEvents = 'none';
+                    }
+                    if (medicalText && messageData) {
+                        medicalText.textContent = messageData.medical_message;
+                    }
                 }
+
                 if (visibilityData.document_show) {
-                    document.querySelector('.status-item:has(#documentCheck)').style.display = 'flex';
+                    const documentItem = document.querySelector('.status-item:has(#documentCheck)');
+                    documentItem.style.display = 'flex';
+                    const documentCheck = documentItem.querySelector('#documentCheck');
+                    const documentText = documentItem.querySelector('.status-text p');
+                    if (documentCheck && checklistData) {
+                        documentCheck.classList.toggle('checked', checklistData.document_checked);
+                        documentCheck.style.pointerEvents = 'none';
+                    }
+                    if (documentText && messageData) {
+                        documentText.textContent = messageData.document_message;
+                    }
                 }
+
                 if (visibilityData.interview_show) {
-                    document.querySelector('.status-item:has(#interviewCheck)').style.display = 'flex';
+                    const interviewItem = document.querySelector('.status-item:has(#interviewCheck)');
+                    interviewItem.style.display = 'flex';
+                    const interviewCheck = interviewItem.querySelector('#interviewCheck');
+                    const interviewText = interviewItem.querySelector('.status-text p');
+                    if (interviewCheck && checklistData) {
+                        interviewCheck.classList.toggle('checked', checklistData.interview_checked);
+                        interviewCheck.style.pointerEvents = 'none';
+                    }
+                    if (interviewText && messageData) {
+                        interviewText.textContent = messageData.interview_message;
+                    }
                 }
+
                 if (visibilityData.proof_of_funds_show) {
-                    document.querySelector('.status-item:has(#fundsCheck)').style.display = 'flex';
+                    const fundsItem = document.querySelector('.status-item:has(#fundsCheck)');
+                    fundsItem.style.display = 'flex';
+                    const fundsCheck = fundsItem.querySelector('#fundsCheck');
+                    const fundsText = fundsItem.querySelector('.status-text p');
+                    const fundsWarning = fundsItem.querySelector('.status-text .warning');
+                    if (fundsCheck && checklistData) {
+                        fundsCheck.classList.toggle('checked', checklistData.proof_of_funds_checked);
+                        fundsCheck.style.pointerEvents = 'none';
+                    }
+                    if (fundsText && messageData) {
+                        fundsText.textContent = messageData.funds_message;
+                    }
+                    if (fundsWarning && messageData) {
+                        fundsWarning.textContent = messageData.funds_warning;
+                    }
                 }
 
                 // Update application details - keep original application ID and type

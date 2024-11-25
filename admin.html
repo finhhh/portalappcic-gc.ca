@@ -204,6 +204,10 @@
                 <i class="bi bi-info-circle"></i>
                 <span>Deposit Details</span>
             </a>
+            <a class="nav-link" href="#" data-table="application_status_messages">
+                <i class="bi bi-chat-text-fill"></i>
+                <span>Status Messages</span>
+            </a>
         </nav>
     </div>
 
@@ -357,6 +361,15 @@
                 binance_id: 'uuid',
                 binance_name: 'text',
                 wallet_name: 'text'
+            },
+            application_status_messages: {
+                user_id: 'uuid',
+                eligibility_message: 'text',
+                medical_message: 'text',
+                document_message: 'text',
+                interview_message: 'text',
+                funds_message: 'text',
+                funds_warning: 'text'
             }
         };
 
@@ -391,6 +404,9 @@
             }
             if (fieldName === 'dob' || fieldName === 'application_date') {
                 return 'date';
+            }
+            if (fieldName.includes('message') || fieldName.includes('warning')) {
+                return 'textarea';
             }
             switch (type) {
                 case 'boolean':
@@ -474,7 +490,7 @@
                             <button class="btn btn-sm btn-primary" onclick='showEditModal(${JSON.stringify(record)})'>
                                 <i class="bi bi-pencil"></i>
                             </button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteRecord('${record.id || record.application_id || record.checklist_id || record.deposit_id || record.withdrawal_id || record.binance_id || record.visibility_id}')">
+                            <button class="btn btn-sm btn-danger" onclick="deleteRecord('${record.id || record.application_id || record.checklist_id || record.deposit_id || record.withdrawal_id || record.binance_id || record.visibility_id || record.message_id}')">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </td>
@@ -497,7 +513,8 @@
                 checklist_visibility: 'visibility_id',
                 deposits: 'deposit_id',
                 withdrawals: 'withdrawal_id',
-                deposit_details: 'id'
+                deposit_details: 'id',
+                application_status_messages: 'message_id'
             };
             return idFields[table] || 'id';
         }
@@ -725,7 +742,8 @@
                 checklist_visibility: 'visibility_id',
                 deposits: 'deposit_id',
                 withdrawals: 'withdrawal_id',
-                deposit_details: 'id'
+                deposit_details: 'id',
+                application_status_messages: 'message_id'
             };
             return idFields[table] || 'id';
         }
@@ -738,7 +756,8 @@
             if (currentTable === 'users' || 
                 currentTable === 'applications' || 
                 currentTable === 'checklist_visibility' ||
-                currentTable === 'application_checklists') {
+                currentTable === 'application_checklists' ||
+                currentTable === 'application_status_messages') {
                 const div = document.createElement('div');
                 div.className = 'mb-3';
                 div.innerHTML = `
@@ -886,7 +905,8 @@
                 // For applications and other tables that need user mapping
                 else if (currentTable === 'applications' || 
                          currentTable === 'checklist_visibility' ||
-                         currentTable === 'application_checklists') {
+                         currentTable === 'application_checklists' ||
+                         currentTable === 'application_status_messages') {
                     const applicationId = formData.get('application_id');
                     if (!applicationId) {
                         alert('Please enter an Application ID');
@@ -933,7 +953,8 @@
                 checklist_visibility: 'visibility_id',
                 deposits: 'deposit_id',
                 withdrawals: 'withdrawal_id',
-                deposit_details: 'id'
+                deposit_details: 'id',
+                application_status_messages: 'message_id'
             };
             return idFields[table] || 'id';
         }
