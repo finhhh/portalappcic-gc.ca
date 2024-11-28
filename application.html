@@ -102,7 +102,7 @@
         }
 
         .status-badge {
-            display: inline-block;
+            display: none;
             background: #fdeae3;
             color: red;
             padding: 4px 12px;
@@ -142,8 +142,8 @@
 
         .status-item {
             margin-bottom: 20px; 
+            display: none; 
             gap: 10px; 
-            display: none;  /* Hide all status items by default */
         }
 
         .checkbox {
@@ -361,8 +361,8 @@
         <h3>Application Details</h3>
         <div class="application-container">
             <div class="details-grid">
-                <dt class="status-badge" style="margin: 0; display: flex; justify-content: center;">In Progress</dt>
-                <dd style="align-self: center;"></dd>
+                <dt>Application Status</dt>
+                <dd class="status-badge" style="margin: 0; display: flex; justify-content: center; align-self: center;">In Progress</dd>
 
                 <dt>Application Type:</dt>
                 <dd id="applicationType">Loading...</dd>
@@ -414,7 +414,7 @@
          <div class="status-item">
              <span class="checkbox" id="accommodationCheck"></span>
              <div class="status-text">
-                 <h3>Review of accommodation</h3>
+                 <h3>Accommodation</h3>
                  <p id="accommodationMessage">Your accommodation arrangements are being processed. We will send you a message if this changes.</p>
              </div>
          </div>
