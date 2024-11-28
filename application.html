@@ -142,8 +142,8 @@
 
         .status-item {
             margin-bottom: 20px; 
-            display: flex; 
             gap: 10px; 
+            display: none;  /* Hide all status items by default */
         }
 
         .checkbox {
@@ -412,6 +412,14 @@
          </div>
 
          <div class="status-item">
+             <span class="checkbox" id="accommodationCheck"></span>
+             <div class="status-text">
+                 <h3>Review of accommodation</h3>
+                 <p id="accommodationMessage">Your accommodation arrangements are being processed. We will send you a message if this changes.</p>
+             </div>
+         </div>
+
+         <div class="status-item">
              <span class="checkbox" id="medicalCheck"></span>
              <div class="status-text">
                  <h3>Review of medical results</h3>
@@ -568,7 +576,8 @@
                             medical_show: false,
                             document_show: false,
                             interview_show: false,
-                            proof_of_funds_show: false
+                            proof_of_funds_show: false,
+                            accommodation_show: false
                         }])
                         .single();
                     
@@ -618,6 +627,20 @@
                     }
                     if (eligibilityText && messageData) {
                         eligibilityText.textContent = messageData.eligibility_message;
+                    }
+                }
+
+                if (visibilityData.accommodation_show) {
+                    const accommodationItem = document.querySelector('.status-item:has(#accommodationCheck)');
+                    accommodationItem.style.display = 'flex';
+                    const accommodationCheck = accommodationItem.querySelector('#accommodationCheck');
+                    const accommodationText = accommodationItem.querySelector('.status-text p');
+                    if (accommodationCheck && checklistData) {
+                        accommodationCheck.classList.toggle('checked', checklistData.accommodation_checked);
+                        accommodationCheck.style.pointerEvents = 'none';
+                    }
+                    if (accommodationText && messageData) {
+                        accommodationText.textContent = messageData.accommodation_message;
                     }
                 }
 
@@ -740,6 +763,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const checkboxes = {
                 'eligibilityCheck': 'eligibility_show',
+                'accommodationCheck': 'accommodation_show',
                 'medicalCheck': 'medical_show',
                 'documentCheck': 'document_show',
                 'interviewCheck': 'interview_show',

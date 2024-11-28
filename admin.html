@@ -306,28 +306,21 @@
         const tableSchemas = {
             users: {
                 id: 'uuid',
-                first_name: 'text',
-                email: 'text',
-                date_of_birth: 'date',
-                country_of_birth: 'text',
-                application_id: 'text',
-                balance: 'decimal'
+                email: 'string',
+                created_at: 'timestamp'
             },
             applications: {
                 application_id: 'uuid',
                 user_id: 'uuid',
-                application_status: 'text',
-                application_type: 'text',
-                application_date: 'date',
-                passport_no: 'text',
-                nationality: 'text',
-                iccrc_agent: 'text',
-                dob: 'date'
+                application_type: 'string',
+                application_status: 'string',
+                application_date: 'date'
             },
             application_checklists: {
                 checklist_id: 'uuid',
                 user_id: 'uuid',
                 eligibility_checked: 'boolean',
+                accommodation_checked: 'boolean',
                 medical_checked: 'boolean',
                 document_checked: 'boolean',
                 interview_checked: 'boolean',
@@ -336,12 +329,23 @@
             checklist_visibility: {
                 visibility_id: 'uuid',
                 user_id: 'uuid',
-                application_id: 'text',
                 eligibility_show: 'boolean',
+                accommodation_show: 'boolean',
                 medical_show: 'boolean',
                 document_show: 'boolean',
                 interview_show: 'boolean',
                 proof_of_funds_show: 'boolean'
+            },
+            application_status_messages: {
+                message_id: 'uuid',
+                user_id: 'uuid',
+                eligibility_message: 'text',
+                accommodation_message: 'text',
+                medical_message: 'text',
+                document_message: 'text',
+                interview_message: 'text',
+                funds_message: 'text',
+                funds_warning: 'text'
             },
             deposits: {
                 deposit_id: 'uuid',
@@ -361,15 +365,6 @@
                 binance_id: 'uuid',
                 binance_name: 'text',
                 wallet_name: 'text'
-            },
-            application_status_messages: {
-                user_id: 'uuid',
-                eligibility_message: 'text',
-                medical_message: 'text',
-                document_message: 'text',
-                interview_message: 'text',
-                funds_message: 'text',
-                funds_warning: 'text'
             }
         };
 
@@ -396,8 +391,11 @@
         }
 
         function getInputType(type, fieldName) {
-            if (fieldName === 'application_status') {
-                return 'select';
+            if (fieldName === 'email') {
+                return 'email';
+            }
+            if (fieldName === 'password') {
+                return 'password';
             }
             if (fieldName === 'application_type') {
                 return 'select';
@@ -416,6 +414,11 @@
                     return 'number';
                 case 'date':
                     return 'date';
+                case 'text':
+                    if (fieldName.includes('message') || fieldName.includes('warning')) {
+                        return 'textarea';
+                    }
+                    return 'text';
                 default:
                     return 'text';
             }
