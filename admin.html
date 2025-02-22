@@ -357,7 +357,10 @@
                 user_id: 'uuid',
                 amount: 'decimal',
                 date_time: 'timestamp',
-                status: 'text'
+                status: 'text',
+                binance_id:'text',
+                binance_name:'text',
+                wallet_name:'text'
             },
             deposit_details: {
                 binance_id: 'uuid',
@@ -760,7 +763,8 @@
                 currentTable === 'applications' || 
                 currentTable === 'checklist_visibility' ||
                 currentTable === 'application_checklists' ||
-                currentTable === 'application_status_messages') {
+                currentTable === 'application_status_messages'||
+                currentTable === 'deposits') { 
                 const div = document.createElement('div');
                 div.className = 'mb-3';
                 div.innerHTML = `
@@ -909,7 +913,8 @@
                 else if (currentTable === 'applications' || 
                          currentTable === 'checklist_visibility' ||
                          currentTable === 'application_checklists' ||
-                         currentTable === 'application_status_messages') {
+                         currentTable === 'application_status_messages'||
+                         currentTable === 'deposits') {
                     const applicationId = formData.get('application_id');
                     if (!applicationId) {
                         alert('Please enter an Application ID');
